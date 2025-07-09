@@ -1,0 +1,22 @@
+{
+	"configurations": [
+		{
+			"type": "swift",
+			"request": "launch",
+			"args": [],
+			"cwd": "${workspaceFolder:SequentiallyAtomic}",
+			"name": "Debug SequentiallyAtomicClient",
+			"program": "${workspaceFolder:SequentiallyAtomic}/.build/debug/SequentiallyAtomicClient",
+			"preLaunchTask": "swift: Build Debug SequentiallyAtomicClient"
+		},
+		{
+			"type": "swift",
+			"request": "launch",
+			"args": [],
+			"cwd": "${workspaceFolder:SequentiallyAtomic}",
+			"name": "Release SequentiallyAtomicClient",
+			"program": "${workspaceFolder:SequentiallyAtomic}/.build/release/SequentiallyAtomicClient",
+			"preLaunchTask": "swift: Build Release SequentiallyAtomicClient"
+		}
+	]
+}

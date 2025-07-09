@@ -9,7 +9,7 @@ import XCTest
 import SequentiallyAtomicMacros
 
 let testMacros: [String: Macro.Type] = [
-    "stringify": StringifyMacro.self,
+    "SequentiallyAtomic": SequentiallyAtomicMacro.self,
 ]
 #endif
 
@@ -18,27 +18,28 @@ final class SequentiallyAtomicTests: XCTestCase {
         #if canImport(SequentiallyAtomicMacros)
         assertMacroExpansion(
             """
-            #stringify(a + b)
+            class Foo {
+                @SequentiallyAtomic var bar: Int
+            }
             """,
             expandedSource: """
-            (a + b, "a + b")
-            """,
-            macros: testMacros
-        )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
-    }
+            class Foo {
+                var bar: Int {
+                    @storageRestrictions(initializes: _bar)
+                    init(initialValue) {
+                        self._bar = Atomic(initialValue)
+                    }
+                    get {
+                        self._bar.load(ordering: .sequentiallyConsistent)
+                    }
+                    set {
+                        self._bar.store(newValue, ordering: .sequentiallyConsistent)
+                    }
+                }
 
-    func testMacroWithStringLiteral() throws {
-        #if canImport(SequentiallyAtomicMacros)
-        assertMacroExpansion(
-            #"""
-            #stringify("Hello, \(name)")
-            """#,
-            expandedSource: #"""
-            ("Hello, \(name)", #""Hello, \(name)""#)
-            """#,
+                private let _bar: Atomic<Int>
+            }
+            """,
             macros: testMacros
         )
         #else
