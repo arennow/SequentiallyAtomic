@@ -14,36 +14,47 @@ let testMacros: [String: Macro.Type] = [
 #endif
 
 final class SequentiallyAtomicTests: XCTestCase {
-    func testMacro() throws {
-        #if canImport(SequentiallyAtomicMacros)
+    func testBasics() throws {
         assertMacroExpansion(
             """
             class Foo {
-                @SequentiallyAtomic var bar: Int
+                @SequentiallyAtomic var barInt: Int
+                @SequentiallyAtomic var barBool: Bool
             }
             """,
             expandedSource: """
             class Foo {
-                var bar: Int {
-                    @storageRestrictions(initializes: _bar)
+                var barInt: Int {
+                    @storageRestrictions(initializes: _barInt)
                     init(initialValue) {
-                        self._bar = Atomic(initialValue)
+                        self._barInt = Atomic(initialValue)
                     }
                     get {
-                        self._bar.load(ordering: .sequentiallyConsistent)
+                        self._barInt.load(ordering: .sequentiallyConsistent)
                     }
                     set {
-                        self._bar.store(newValue, ordering: .sequentiallyConsistent)
+                        self._barInt.store(newValue, ordering: .sequentiallyConsistent)
                     }
                 }
 
-                private let _bar: Atomic<Int>
+                private let _barInt: Atomic<Int>
+                var barBool: Bool {
+                    @storageRestrictions(initializes: _barBool)
+                    init(initialValue) {
+                        self._barBool = Atomic(initialValue)
+                    }
+                    get {
+                        self._barBool.load(ordering: .sequentiallyConsistent)
+                    }
+                    set {
+                        self._barBool.store(newValue, ordering: .sequentiallyConsistent)
+                    }
+                }
+
+                private let _barBool: Atomic<Bool>
             }
             """,
             macros: testMacros
         )
-        #else
-        throw XCTSkip("macros are only supported when running tests for the host platform")
-        #endif
     }
 }
