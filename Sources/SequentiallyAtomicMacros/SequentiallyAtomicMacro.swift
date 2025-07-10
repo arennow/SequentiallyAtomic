@@ -1,3 +1,4 @@
+import SwiftCompilerPlugin
 import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
@@ -60,8 +61,15 @@ public struct SequentiallyAtomicMacro: AccessorMacro, PeerMacro {
 		
 		return [DeclSyntax(storageProperty)]
 	}
+	
+	enum MacroError: Error {
+		case invalidDeclaration
+	}
 }
 
-enum MacroError: Error {
-	case invalidDeclaration
+@main
+struct SequentiallyAtomicPlugin: CompilerPlugin {
+	let providingMacros: [Macro.Type] = [
+		SequentiallyAtomicMacro.self,
+	]
 }
